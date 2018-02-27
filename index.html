@@ -2,17 +2,14 @@
 <html>
 <head>
 	<title></title>
-<script src="https://js.leapmotion.com/leap-0.6.4.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://js.leapmotion.com/leap-0.6.4.min.js"></script>
+	<script type="text/javascript" src="main.js"></script>
 </head>
 <body>
 	<div id="output"></div>
 </body>
 
 
-<script type="text/javascript">
-	var output = document.getElementById('output')
-	Leap.loop(function(frame) {
-		output.innerHTML = 'Frame Count: ' + frame.id;
-	})
-</script>
+
 </html>
