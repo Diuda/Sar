@@ -1,32 +1,51 @@
-$(document).ready(function(){
-	var cats = {}
-	Leap.loop(function(frame){
-		frame.hands.forEach(function(hand, index){
-			var cat = ( cats[index] || (cats[index] = new Cat()) );
-			cat.setTransform(hand.screenPosition(), hand.roll());
-			// console.log(hand)
-		})
-	}).use('screenPosition', {scale: 0.25});
-	var Cat = function() {
-		var cat = this;
-		var img = document.createElement('img');
-  		img.src = 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/109794/cat_2.png';
-  		img.style.position = 'absolute';
-  		img.onload = function () {
-  			cat.setTransform([window.innerWidth/2,window.innerHeight/2], 0);
-    		document.body.appendChild(img);
-  }
+$(document).ready(function () {
+	// var frameDisp = $('#output')
+	var controller = new Leap.Controller({
+		host: '127.0.0.1',
+		port: 6437,
+		frameEventName: 'animationFrame',
+		useAllPlugins: false,
+		optimizeHMD: true,
+		loopWhileDisconnected: false,
+		enableGestures: true
+	});
 
-			cat.setTransform = function(position, rotation) {
-			    img.style.left = position[0] - img.width  / 2 + 'px';
-		  		img.style.top  = position[1] - img.height / 2 + 'px';
+	// var controller = new Leap.Controller()
 
-		  		img.style.transform = 'rotate(' + -rotation + 'rad)';
+	// controller.connect()
 
-		  		img.style.webkitTransform = img.style.MozTransform = img.style.msTransform =
-		  		img.style.OTransform = img.style.transform;
-			};
+	const fingers = ["THUMB", "INDEX", "MIDDLE", "RING", "PINKY"]
+	var testSocket = new WebSocket("ws://192.168.31.8:8761")
 
-	};
-	cats[0] = new Cat();
+	$('#close').on('click', function () {
+		controller.disconnect()
+		testSocket.close()
+	})
+	$('#start').on('click', function () {
+		controller.connect()
+	})
+	console.log()
+	controller.on('connect', function () {
+		var frame = controller.frame()
+		// console.log("Sup")
+		// if (frame.hands.length > 0) {
+		// }
+
+
+	})
+
+	controller.on('frame', function (frame) {
+		// console.log(frame.hands.length)
+		if (frame.hands.length > 0) {
+			console.log('SUP')
+			testSocket.send('Palm Position: ' + frame.hands[0].palmPosition + '  Palm Velocity: ' + frame.hands[0].palmVelocity + ' Hand Direction: ' + frame.hands[0].direction + "\r\n")
+
+			frame.hands[0].finger.forEach(fingers => {
+				console.log(fingers)
+			});
+			var palmNormal = frame.hands[0].palmNormal
+			
+		}
+	})
+
 })
