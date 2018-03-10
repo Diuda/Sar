@@ -1,7 +1,7 @@
 import os, sys, inspect, thread, time
-
+import numpy as np
 import sys
-sys.path.insert(0, '/home/codeplayer/Desktop/LeapMotion/LeapDeveloperKit_2.3.1+31549_linux/LeapSDK/lib')
+sys.path.insert(0, 'C:\Users\diuda\Desktop\LeapDeveloperKit_3.2.0+45899_win\LeapSDK\lib')
 import Leap
 # from Leap import Controller
 import csv
@@ -16,20 +16,27 @@ class LeapListener(Leap.Listener):
         self.frameCount = 0
         self.prev_frame = []
         print ("Initialized")
-    
+
     def on_frame(self,controller):
-        if self.frameCount == 200:
+        if self.frameCount == 300:
             # controller.set_policy(Leap.Controller.POLICY_ALLOW_PAUSE_RESUME)
             # controller.set_paused(True)
-            with open('./TrainData/train_data3.csv','wb') as csvfile:
+            with open('./Little/Little9.csv','wb') as csvfile:
                 writer = csv.writer(csvfile)
                 for feature in feature_set_list:
                     writer.writerow(feature)
             print "done"
+            return
             
-        self.frameCount = self.frameCount+1
         frame =  controller.frame()
         hands = frame.hands
+        if len(hands)==0:
+            # print "bleh"
+            return
+        if self.frameCount==0:
+            print "Starting"
+            time.sleep(2)
+        self.frameCount = self.frameCount+1
         feature_set = []
         hand_present = False
         for hand in hands:
@@ -46,23 +53,36 @@ class LeapListener(Leap.Listener):
 
         if  self.frameCount==1:
             self.prev_frame = finger_set
+            return
         else:
             # cur_set = finger_set-self.prev_frame
             cur_set =  zip(finger_set,self.prev_frame)
             cur_feature_set = []
-            for val in cur_set:
+
+            for val in cur_set[:-1]:
                 diff_vec = val[0]-val[1]
-                cur_feature_set.append(diff_vec)
-            
-        
+                x_comp = diff_vec.x
+                y_comp = diff_vec.y
+                z_comp = diff_vec.z
+                vec = np.array([x_comp,y_comp,z_comp])
+                magnitude = np.linalg.norm(vec)
+                vec = vec/magnitude
+                cur_feature_set.append(vec)
+
 
             self.prev_frame = finger_set
-            for feature in cur_feature_set:
+            for feature in finger_set:
                 feature_set.append(feature.x)
                 feature_set.append(feature.y)
                 feature_set.append(feature.z)
+            for feature in cur_feature_set:
+                feature_set.append(feature[0])
+                feature_set.append(feature[1])
+                feature_set.append(feature[2])
+            
             feature_set_list.append(feature_set)
-
+                
+            print feature_set
 
     
 
