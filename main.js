@@ -37,14 +37,22 @@ $(document).ready(function () {
 
 	controller.on('frame', function (frame) {
 		if (frame.hands.length > 0) {
-
+			var hand = frame.hands[0]
 			frame.hands[0].fingers.forEach(fingers => {
-				console.log(fingers.direction)
+				// console.log(fingers.bones)
 				testSocket.send("Fingers position: "+fingers.direction)
 			});
-			console.log("PalM Velocity: "+frame.hands[0].palmVelocity)
+
+			var pitch = hand.pitch()
+			var roll = hand.roll()
+			var yaw = hand.yaw()
+			console.log("pitch: "+pitch+" roll: "+roll+" yaw: "+yaw)
+			console.log("Carp Position: "+ frame.hands[0].fingers[0].carpPosition)
+			console.log("Distal Position: "+ frame.hands[0].fingers[0].dipPosition)		
+			// console.log("PalM Velocity: "+frame.hands[0].palmVelocity)
+			
 			var palmNormal = frame.hands[0].palmNormal
-			console.log("Palm Normal: "+palmNormal)
+			// console.log("Palm Normal: "+palmNormal)
 			
 		}
 	})
