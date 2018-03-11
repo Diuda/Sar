@@ -15,7 +15,7 @@ $(document).ready(function () {
 	// controller.connect()
 
 	const fingers = ["THUMB", "INDEX", "MIDDLE", "RING", "PINKY"]
-	var testSocket = new WebSocket("ws://192.168.31.8:8761")
+	var testSocket = new WebSocket("ws://192.168.31.190:8761")
 
 	$('#close').on('click', function () {
 		controller.disconnect()
@@ -36,13 +36,11 @@ $(document).ready(function () {
 	})
 
 	controller.on('frame', function (frame) {
-		// console.log(frame.hands.length)
 		if (frame.hands.length > 0) {
-			// console.log('SUP')
-			// testSocket.send('Palm Position: ' + frame.hands[0].palmPosition + '  Palm Velocity: ' + frame.hands[0].palmVelocity + ' Hand Direction: ' + frame.hands[0].direction + "\r\n")
 
 			frame.hands[0].fingers.forEach(fingers => {
 				console.log(fingers.direction)
+				testSocket.send("Fingers position: "+fingers.direction)
 			});
 			console.log("PalM Velocity: "+frame.hands[0].palmVelocity)
 			var palmNormal = frame.hands[0].palmNormal
