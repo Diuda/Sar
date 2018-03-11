@@ -27,6 +27,7 @@ $(document).ready(function () {
 	console.log()
 	controller.on('connect', function () {
 		var frame = controller.frame()
+		// frame.use()
 		// console.log("Sup")
 		// if (frame.hands.length > 0) {
 		// }
@@ -37,13 +38,15 @@ $(document).ready(function () {
 	controller.on('frame', function (frame) {
 		// console.log(frame.hands.length)
 		if (frame.hands.length > 0) {
-			console.log('SUP')
-			testSocket.send('Palm Position: ' + frame.hands[0].palmPosition + '  Palm Velocity: ' + frame.hands[0].palmVelocity + ' Hand Direction: ' + frame.hands[0].direction + "\r\n")
+			// console.log('SUP')
+			// testSocket.send('Palm Position: ' + frame.hands[0].palmPosition + '  Palm Velocity: ' + frame.hands[0].palmVelocity + ' Hand Direction: ' + frame.hands[0].direction + "\r\n")
 
-			frame.hands[0].finger.forEach(fingers => {
-				console.log(fingers)
+			frame.hands[0].fingers.forEach(fingers => {
+				console.log(fingers.direction)
 			});
+			console.log("PalM Velocity: "+frame.hands[0].palmVelocity)
 			var palmNormal = frame.hands[0].palmNormal
+			console.log("Palm Normal: "+palmNormal)
 			
 		}
 	})
