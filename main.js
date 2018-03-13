@@ -60,11 +60,11 @@ $(document).ready(function () {
 			var pitch = hand.pitch()
 			var roll = hand.roll()
 			var yaw = hand.yaw() 
-			var thumb = hand.fingers[0].tipPosition
-			var indexF = hand.fingers[1].tipPosition
-			var middleF = hand.fingers[2].tipPosition
-			var ringF = hand.fingers[3].tipPosition
-			var pinkyF = hand.fingers[4].tipPosition
+			var thumb = hand.fingers[0].direction
+			var indexF = hand.fingers[1].direction
+			var middleF = hand.fingers[2].direction
+			var ringF = hand.fingers[3].direction
+			var pinkyF = hand.fingers[4].direction
 			var palmVelocity = hand.palmVelocity;
 			var palmNormal = hand.palmNormal;
 			var palmPosition = hand.palmPosition;
