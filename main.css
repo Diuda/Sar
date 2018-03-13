@@ -24,10 +24,6 @@
     
 }
 
-
-
-
-/* GLOBAL STYLES */
 body {
     background-color: #706fd3;
     font-family: hinglish, sans-serif;
@@ -37,32 +33,4 @@ body {
     max-width: 100%;
   }
   
-  /* DEMO-SPECIFIC STYLES */
-  /* .typewriter h1 { */
-    /* position: absolute;
-    color: #2c3e50;
-    font-family: hinglish;
-    overflow: hidden; 
-    border-right: .15em solid black; 
-    white-space: nowrap; 
-    margin: 0 auto; 
-    letter-spacing: .15em;  */
-    /* left: 35%;
-    top: 10%;
-    font-size: 6em;
-    animation: 
-      typing 3.5s steps(30, end),
-      blink-caret .5s step-end infinite; */
-  /* } */
   
-  /* The typing effect */
-  /* @keyframes typing {
-    from { width: 0 }
-    to { width: 60% }
-  } */
-  
-  /* The typewriter cursor effect */
-  /* @keyframes blink-caret {
-    from, to { border-color: transparent }
-    50% { border-color: black }
-  } */
