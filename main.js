@@ -1,5 +1,17 @@
 $(document).ready(function () {
 	// var frameDisp = $('#output')
+
+	if ('speechSynthesis' in window) {
+		console.log("speech Synthesis present")
+		var msg = new SpeechSynthesisUtterance('Meri bandi hai');
+		window.speechSynthesis.speak(msg);
+
+	   }
+	
+	   typeWriter();
+	
+
+	   
 	var controller = new Leap.Controller({
 		host: '127.0.0.1',
 		port: 6437,
@@ -141,4 +153,18 @@ function magnitude(arr){
 	})
 	return Math.sqrt(square)
 
+}
+
+var c = 0
+var title = "Sarthi"
+var speed = 100
+
+function typeWriter(){
+
+	if(c<title.length){
+	document.getElementById("head").innerHTML += title.charAt(c);
+	c++;
+	setTimeout(typeWriter, speed)
+	}
+	
 }
