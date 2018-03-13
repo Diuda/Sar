@@ -4,6 +4,7 @@ import asyncio
 import sys
 import websockets
 
+from collections import Counter
 
 import sys
 sys.path.insert(0, 'C:\LeapDeveloperKit_3.2.0+45899_win\LeapSDK\lib')
@@ -22,7 +23,8 @@ from sklearn.externals import joblib
 import sklearn.svm
 
 
-
+dimensions = 81
+wordSet = ['hi','Sorry','My','Name','How','You','Good']
 data = []
 v_set = []
 arm_dir_set = []
@@ -31,11 +33,14 @@ f_tip_set = []
 f_angle_set = []
 phlanx_set_pre = []
 phlanx_set = []
-dynamic = False
-static = False
+feature_set_list = []
+dynamic = None
+static = None
 fuck=0
+responseString = ''
 async def hello(websocket, path):
     global dynamic
+    global feature_set_list
     global static
     global data
     global v_set
@@ -47,6 +52,7 @@ async def hello(websocket, path):
     count = 0
     ele = ''
     elelist = []
+    feature_set = []
     try:
         while True:
             name = await websocket.recv()
@@ -81,25 +87,71 @@ async def hello(websocket, path):
             f_angle_set.extend((elelist[84], elelist[85], elelist[86]))
             v_mag = np.linalg.norm(np.array((elelist[0],elelist[1],elelist[2])))
             v_set.append(v_mag)
-
+            
+            feature_set.append((palm_set,f_tip_set,f_angle_set,phlanx_set))
+            feature_list = []
+            for feature in feature_set:
+                for value in feature:
+                    feature_list.append(value)
+            
+            feature_set = []
+            feature_set_list.append(feature_list)
             if count%30 == 0:
+
+                majority_vote = Counter()
                 
                 meanVel =  int(sum(v_set)/len(v_set))
                 if meanVel < 100:
+                    if dynamic == True:
+                        responseString+=' '
                     static = True
                     dynamic = False
+                    count=0
+                    model = joblib.load('StaticData/StaticClassifier.pkl')
+
+                    for sample in feature_set_list:
+                        output= model.predict(np.array(sample).reshape(-1,dimensions))
+                        majority_vote[chr(output+ord('a'))]+=1
+
+
+                    prediction = Counter(majority_vote).most_common(1)[0]  
+                    responseString+=prediction
+                    feature_set_list = []
+                    
                 else:
+                    if static == True:
+                        responseString+=' '
                     dynamic = True
                     static = False
-                
+                    
                 # print (meanVel)
                 v_set = []
             
-            print (phlanx_set)
-            elelist = []
-            phlanx_set = []
-            f_angle_set = []
-                
+            # Only consider dynamic if 160 frames passed
+            if dynamic and count>=160:
+                if static == False:
+
+                best_possible = [] # stores the best score for each gesture
+                for val in wordSet:
+                        os.chdir('{}'.format(val)) #Enter gesture directory
+                        distVal = []
+                        for i in xrange(1,11): #Sample the 10 samples
+                            sequence_set = []
+                            with open('{}{}.csv'.format(val,i),'r') as csvfile:
+                                reader = csv.reader(csvfile,lineterminator='\n')
+                                for row in reader:
+                                    sequence_set.append([float(x) for x in row])
+                            
+                            distance,path = fastdtw(feature_set_list,sequence_set,dist=euclidean)
+                            distVal.append((distance,val))
+
+                    best_possible.append(min(distVal))
+                        os.chdir('../')
+                prediction = min(best_possible[1]) 
+                count=0
+                feature_set_list = []
+                dynamic=False
+            
     except Exception as ex:
         print ("Ye fuck kr rha hai: ",fuck)
         print (ex.__class__.__name__)
