@@ -51,23 +51,33 @@ async def hello(websocket, path):
         while True:
             name = await websocket.recv()
             for i in name:
+                # getting all the elements before a ',' as the data comes as string
                 if i != ',':
                     ele = ele + i
                 else:
+                    # append the values in a list
                     elelist.append(ele)
                     ele = '' 
+            # delete the last empty value
             del elelist[-1]
+            # convert the list into float values
             elelist = [float(i) for i in elelist]
-            # print (elelist)
            
+        #    keeping count for palm velocity
             count +=1
+            # pitch roll yaw
             arm_dir_set.extend((elelist[9], elelist[10], elelist[11]))
+            # palm position and pal normal
             palm_set.extend((elelist[3], elelist[4], elelist[5], elelist[6], elelist[7], elelist[8]))
+            # finger tip position directions
             f_tip_set.extend((elelist[12], elelist[13], elelist[14], elelist[15], elelist[16], elelist[17], elelist[18], elelist[19], elelist[20], elelist[21], elelist[22], elelist[23], elelist[24], elelist[25], elelist[26]))
             for i in range(27, 84):
+                # bone position difference form palm position
                 phlanx_set_pre.append(elelist[i])  
             phlanx_set.extend(phlanx_set_pre)        
             # phlanx_set.extend((elelist[27], elelist[28], elelist[29], elelist[30], elelist[31], elelist[32], elelist[33], elelist[34], elelist[35], elelist[36], elelist[37], elelist[38], elelist[39], elelist[40], elelist[41], elelist[42], elelist[43], elelist[44], elelist[45]))
+            
+            # angle between thumb_index, index_ring, ring_pinky fingers
             f_angle_set.extend((elelist[84], elelist[85], elelist[86]))
             v_mag = np.linalg.norm(np.array((elelist[0],elelist[1],elelist[2])))
             v_set.append(v_mag)
