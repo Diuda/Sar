@@ -66,7 +66,7 @@ async def hello(websocket, path):
         #    keeping count for palm velocity
             count +=1
             # pitch roll yaw
-            arm_dir_set.extend((elelist[9], elelist[10], elelist[11]))
+            # arm_dir_set.extend((elelist[9], elelist[10], elelist[11]))
             # palm position and pal normal
             palm_set.extend((elelist[3], elelist[4], elelist[5], elelist[6], elelist[7], elelist[8]))
             # finger tip position directions
@@ -81,6 +81,7 @@ async def hello(websocket, path):
             f_angle_set.extend((elelist[84], elelist[85], elelist[86]))
             v_mag = np.linalg.norm(np.array((elelist[0],elelist[1],elelist[2])))
             v_set.append(v_mag)
+
             if count%30 == 0:
                 
                 meanVel =  int(sum(v_set)/len(v_set))
