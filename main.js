@@ -27,7 +27,7 @@ $(document).ready(function () {
 	// controller.connect()
 
 	const fingers = ["THUMB", "INDEX", "MIDDLE", "RING", "PINKY"]
-	var testSocket = new WebSocket("ws://192.168.31.190:8761")
+	var testSocket = new WebSocket("ws://192.168.31.92:8761")
 	var data = [];
 	var diff_finger_bones1 = Leap.vec3.create();
 	var diff_finger_bones2 = Leap.vec3.create();
@@ -48,9 +48,13 @@ $(document).ready(function () {
 	var diff_finger_bones17 = Leap.vec3.create();
 	var diff_finger_bones18 = Leap.vec3.create();
 	var diff_finger_bones19 = Leap.vec3.create();
-	var angle1 = Leap.vec3.create();
-	var angle2 = Leap.vec3.create();
-	var angle3 = Leap.vec3.create();
+	var thumbAngle = Leap.vec3.create();
+	var indexAngle = Leap.vec3.create();
+	var pinkyAngle = Leap.vec3.create();
+	var ringAngle = Leap.vec3.create();
+	var angle1;
+	var angle2;
+	var angle3;
 	$('#close').on('click', function () {
 		controller.disconnect()
 		testSocket.close()
@@ -90,17 +94,17 @@ $(document).ready(function () {
 			var palmPosition = hand.palmPosition;
 			
 
-			// data.push(hand.palmVelocity);
-			// data.push(palmPosition)
-			// data.push(palmNormal)
-			// data.push(pitch)
-			// data.push(roll)
-			// data.push(yaw)
-			// data.push(thumb)
-			// data.push(indexF)
-			// data.push(middleF)
-			// data.push(ringF)
-			// data.push(pinkyF)
+			data.push(hand.palmVelocity);
+			data.push(palmPosition)
+			data.push(palmNormal)
+			data.push(pitch)
+			data.push(roll)
+			data.push(yaw)
+			data.push(thumb)
+			data.push(indexF)
+			data.push(middleF)
+			data.push(ringF)
+			data.push(pinkyF)
 			Leap.vec3.subtract(diff_finger_bones1, hand.fingers[0].pipPosition, hand.palmPosition)
 			// console.log(diff_finger_bones1)
 			data.push(diff_finger_bones1)
@@ -141,12 +145,12 @@ $(document).ready(function () {
 			data.push(diff_finger_bones18)
 			Leap.vec3.subtract(diff_finger_bones19, hand.fingers[4].tipPosition, hand.palmPosition)
 			data.push(diff_finger_bones19)
-			angle1 = Leap.vec3.angle(thumb, indexF)
-			data.push(angle1)
-			angle2 = Leap.vec3.angle(indexF, ringF)
-			data.push(angle2)
-			angle3 = Leap.vec3.angle(ringF, pinkyF)
-			data.push(angle3)
+			
+		
+			data.push(Math.acos((Leap.vec3.dot(thumb, indexF))/(magnitude(thumb)*magnitude(indexF))))
+			data.push(Math.acos((Leap.vec3.dot(indexF, ringF))/(magnitude(indexF)*magnitude(ringF))))
+			data.push(Math.acos((Leap.vec3.dot(ringF, pinkyF))/(magnitude(ringF)*magnitude(pinkyF))))
+
 
 			data.push(",")
 			testSocket.send(data)
@@ -188,3 +192,6 @@ function typeWriter(){
 	}
 	
 }
+
+
+
