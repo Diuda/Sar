@@ -69,6 +69,14 @@ async def hello(websocket, path):
             name = await websocket.recv()
             # print ("here")
 
+            # delete the last empty value
+            # convert the list into float values
+            # print (elelist)
+        #    keeping count for palm velocity
+            count +=1
+            if count<70:
+                continue
+            
             for i in name:
                 # getting all the elements before a ',' as the data comes as string
                 if i != ',':
@@ -77,13 +85,9 @@ async def hello(websocket, path):
                     # append the values in a list
                     elelist.append(ele)
                     ele = '' 
-            # delete the last empty value
             del elelist[-1]
-            # convert the list into float values
             elelist = [float(i) for i in elelist]
-            # print (elelist)
-        #    keeping count for palm velocity
-            count +=1
+            
             # pitch roll yaw
             # arm_dir_set.extend((elelist[9], elelist[10], elelist[11]))
             # palm position and pal normal
@@ -117,28 +121,24 @@ async def hello(websocket, path):
             # print (feature_list)
             feature_set_list.append(feature_list)
             # print feature_set_list
-            if count%30 == 0:
-
-                majority_vote = Counter()
-                
+            if count==100:
                 meanVel =  int(sum(v_set)/len(v_set))
                 if meanVel < 100:
-                    if dynamic == True:
-                        responseString+=' '
+                    
+                    majority_vote = Counter()
                     static = True
                     dynamic = False
                     count=0
                     model = joblib.load('StaticData/StaticClassifier.pkl')
-                    print ("Hello")
                     for sample in feature_set_list:
-                        print(sample)                        
+                        # print(sample)                        
                         output= model.predict(np.array(sample).reshape(-1,dimensions))
-                        print (chr(output+ord('a')) )
+                        # print (chr(output+ord('a')) )
                         majority_vote[chr(output+ord('a'))]+=1
 
 
                     prediction = Counter(majority_vote).most_common(1)[0]  
-                    responseString+=prediction
+                    responseString+=str(prediction[0])
                     feature_set_list = []
                     
                 else:
@@ -151,8 +151,9 @@ async def hello(websocket, path):
                 v_set = []
             
             # Only consider dynamic if 160 frames passed
-            if dynamic and count>=160:
-
+            if dynamic and count>=230:
+                
+                print("Dynamic Gesture Recognized")
                 best_possible = [] # stores the best score for each gesture
                 for val in wordSet:
                         os.chdir('{}'.format(val)) #Enter gesture directory
@@ -164,24 +165,28 @@ async def hello(websocket, path):
                                 for row in reader:
                                     sequence_set.append([float(x) for x in row])
 
-                            print(feature_set_list)
+                            # print(feature_set_list)
                             distance,path = fastdtw(feature_set_list,sequence_set,dist=euclidean)
                             distVal.append((distance,val))
 
                         best_possible.append(min(distVal))
                         os.chdir('../')
-                prediction = min(best_possible[1]) 
+                prediction = min(best_possible)[1]
+                responseString+=str(prediction)
+                responseString+=' '
                 count=0
                 feature_set_list = []
                 dynamic=False
+                print("Dynamic Gesture Complete")
             
     except Exception as ex:
+        # print/t (responseString)
         tb = traceback.format_exc()
         print ("Ye fuck kr rha hai: ",fuck)
         print (ex.__class__.__name__)
     finally:
-        print (tb)
-        sys.exit(0)
+        # print (tb)
+        print (responseString)
 start_server = websockets.serve(hello, '192.168.31.92', 8761 )
 
 asyncio.get_event_loop().run_until_complete(start_server)
