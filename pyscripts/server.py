@@ -144,6 +144,7 @@ async def hello(websocket, path):
                 else:
                     if static == True:
                         responseString+=' '
+                        await websocket.send(responseString)
                     dynamic = True
                     static = False
                     
@@ -158,7 +159,7 @@ async def hello(websocket, path):
                 for val in wordSet:
                         os.chdir('{}'.format(val)) #Enter gesture directory
                         distVal = []
-                        for i in range(1,11): #Sample the 10 samples
+                        for i in range(1,4): #Sample the 10 samples
                             sequence_set = []
                             with open('{}{}.csv'.format(val,i),'r') as csvfile:
                                 reader = csv.reader(csvfile,lineterminator='\n')
@@ -177,6 +178,7 @@ async def hello(websocket, path):
                 count=0
                 feature_set_list = []
                 dynamic=False
+                await websocket.send(responseString)
                 print("Dynamic Gesture Complete")
             
     except Exception as ex:
@@ -187,7 +189,8 @@ async def hello(websocket, path):
     finally:
         # print (tb)
         print (responseString)
-start_server = websockets.serve(hello, '192.168.31.92', 8761 )
+        sys.exit(0)
+start_server = websockets.serve(hello, '192.168.31.190', 8761 )
 
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()
