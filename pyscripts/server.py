@@ -68,8 +68,7 @@ async def hello(websocket, path):
             elelist = []
             name = await websocket.recv()
             # print ("here")
-            print (name)
-            sys.exit(0)
+
             for i in name:
                 # getting all the elements before a ',' as the data comes as string
                 if i != ',':
@@ -135,7 +134,6 @@ async def hello(websocket, path):
                         print(sample)                        
                         output= model.predict(np.array(sample).reshape(-1,dimensions))
                         print (chr(output+ord('a')) )
-                        sys.exit(0)
                         majority_vote[chr(output+ord('a'))]+=1
 
 
