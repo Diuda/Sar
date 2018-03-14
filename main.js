@@ -27,7 +27,7 @@ $(document).ready(function () {
 	// controller.connect()
 
 	const fingers = ["THUMB", "INDEX", "MIDDLE", "RING", "PINKY"]
-	var testSocket = new WebSocket("ws://192.168.31.92:8761")
+	var testSocket = new WebSocket("ws://192.168.31.190:8761")
 	var data = [];
 	var diff_finger_bones1 = Leap.vec3.create();
 	var diff_finger_bones2 = Leap.vec3.create();
@@ -172,6 +172,8 @@ $(document).ready(function () {
 
 	testSocket.onmessage = function (event){
 		console.log(event.data)
+		var msg = new SpeechSynthesisUtterance(event.data);
+		window.speechSynthesis.speak(msg);
 	}
 
 })
