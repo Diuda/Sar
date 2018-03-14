@@ -166,7 +166,13 @@ $(document).ready(function () {
 			
 			
 		}
+
+		
 	})
+
+	testSocket.onmessage = function (event){
+		console.log(event.data)
+	}
 
 })
 
