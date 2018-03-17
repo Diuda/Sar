@@ -8,7 +8,6 @@ import websockets
 from collections import Counter
 
 import sys
-sys.path.insert(0, 'C:\LeapDeveloperKit_3.2.0+45899_win\LeapSDK\lib')
 import os
 import csv
 import keyboard
@@ -37,7 +36,8 @@ phlanx_set = []
 feature_set_list = []
 dynamic = None
 static = None
-fuck=0
+
+countgest=0
 responseString = ''
 async def hello(websocket, path):
     global dynamic
@@ -124,6 +124,7 @@ async def hello(websocket, path):
             if count==100:
                 meanVel =  int(sum(v_set)/len(v_set))
                 if meanVel < 100:
+                    print("Static detected")
                     
                     majority_vote = Counter()
                     static = True
@@ -137,9 +138,13 @@ async def hello(websocket, path):
                         majority_vote[chr(output+ord('a'))]+=1
 
 
-                    prediction = Counter(majority_vote).most_common(1)[0]  
-                    responseString+=str(prediction[0])
+                    prediction = Counter(majority_vote).most_common(1)[0]
+
+                    if len(responseString)>1:
+                        if (responseString[-1]!=prediction[0]):
+                            responseString+=str(prediction[0])
                     feature_set_list = []
+                    print("Static ends")
                     
                 else:
                     if static == True:
@@ -159,7 +164,8 @@ async def hello(websocket, path):
                 for val in wordSet:
                         os.chdir('{}'.format(val)) #Enter gesture directory
                         distVal = []
-                        for i in range(1,4): #Sample the 10 samples
+                      
+                        for i in range(1,6): #Sample the 10 samples
                             sequence_set = []
                             with open('{}{}.csv'.format(val,i),'r') as csvfile:
                                 reader = csv.reader(csvfile,lineterminator='\n')
@@ -169,12 +175,14 @@ async def hello(websocket, path):
                             # print(feature_set_list)
                             distance,path = fastdtw(feature_set_list,sequence_set,dist=euclidean)
                             distVal.append((distance,val))
-
+                       
+                                
                         best_possible.append(min(distVal))
                         os.chdir('../')
                 prediction = min(best_possible)[1]
-                responseString+=str(prediction)
-                responseString+=' '
+                if str(prediction) not in responseString:
+                    responseString+=str(prediction)
+                    responseString+=' '
                 count=0
                 feature_set_list = []
                 dynamic=False
@@ -182,15 +190,15 @@ async def hello(websocket, path):
                 print("Dynamic Gesture Complete")
             
     except Exception as ex:
-        # print/t (responseString)
+        print (responseString)
         tb = traceback.format_exc()
-        print ("Ye fuck kr rha hai: ",fuck)
         print (ex.__class__.__name__)
     finally:
         # print (tb)
+       
         print (responseString)
         sys.exit(0)
-start_server = websockets.serve(hello, '192.168.31.190', 8761 )
+start_server = websockets.serve(hello, 'localhost', 8761 )
 
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()
