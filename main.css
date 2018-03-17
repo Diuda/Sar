@@ -9,6 +9,14 @@
     top: 50%;
 }
 
+#textval{
+    position: absolute;
+    top: 70%;
+    left: 40%;
+    font-size: 5em;
+    font-family: sans-serif;
+}
+
 .buttn{
     padding: 1em;
     width: 10em;
