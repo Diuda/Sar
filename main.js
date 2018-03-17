@@ -1,12 +1,7 @@
 $(document).ready(function () {
 	// var frameDisp = $('#output')
 
-	if ('speechSynthesis' in window) {
-		console.log("speech Synthesis present")
-		// var msg = new SpeechSynthesisUtterance('Meri bandi hai');
-		// window.speechSynthesis.speak(msg);
 
-	   }
 	
 	   typeWriter();
 	
@@ -27,8 +22,9 @@ $(document).ready(function () {
 	// controller.connect()
 
 	const fingers = ["THUMB", "INDEX", "MIDDLE", "RING", "PINKY"]
-	var testSocket = new WebSocket("ws://192.168.31.190:8761")
+	var testSocket = new WebSocket("ws://localhost:8761")
 	var data = [];
+	var headers;
 	var diff_finger_bones1 = Leap.vec3.create();
 	var diff_finger_bones2 = Leap.vec3.create();
 	var diff_finger_bones3 = Leap.vec3.create();
@@ -62,13 +58,9 @@ $(document).ready(function () {
 	$('#start').on('click', function () {
 		controller.connect()
 	})
-	console.log()
+
 	controller.on('connect', function () {
 		var frame = controller.frame()
-		// frame.use()
-		// console.log("Sup")
-		// if (frame.hands.length > 0) {
-		// }
 
 
 	})
@@ -78,7 +70,6 @@ $(document).ready(function () {
 			var hand = frame.hands[0]
 			frame.hands[0].fingers.forEach(fingers => {
 				// console.log(fingers.bones)
-				// testSocket.send("Fingers position: "+fingers.direction)
 			});
 
 			var pitch = hand.pitch()
@@ -106,10 +97,8 @@ $(document).ready(function () {
 			data.push(ringF)
 			data.push(pinkyF)
 			Leap.vec3.subtract(diff_finger_bones1, hand.fingers[0].pipPosition, hand.palmPosition)
-			// console.log(diff_finger_bones1)
 			data.push(diff_finger_bones1)
 			Leap.vec3.subtract(diff_finger_bones2, hand.fingers[0].dipPosition, hand.palmPosition)
-			// console.log(diff_finger_bones2)
 			data.push(diff_finger_bones2)
 			Leap.vec3.subtract(diff_finger_bones3, hand.fingers[0].tipPosition, hand.palmPosition)
 			data.push(diff_finger_bones3)
@@ -154,15 +143,8 @@ $(document).ready(function () {
 
 			data.push(",")
 			testSocket.send(data)
-			// console.log(data)
 			data = []
-			// testSocket.send(hand.palmVelocity)
-			
-			// console.log("pitch: "+pitch+" roll: "+roll+" yaw: "+yaw)
-			// console.log("Carp Position: "+ frame.hands[0].fingers[0].carpPosition)
-			// console.log("Distal Position: "+ frame.hands[0].fingers[0].dipPosition)
-			// console.log("Pinky: "+pinkyF.direction)		
-			// console.log("PalM Velocity: "+frame.hands[0].palmVelocity)
+
 			
 			
 		}
@@ -172,8 +154,14 @@ $(document).ready(function () {
 
 	testSocket.onmessage = function (event){
 		console.log(event.data)
-		var msg = new SpeechSynthesisUtterance(event.data);
-		window.speechSynthesis.speak(msg);
+		document.getElementById("textval").innerHTML = event.data;
+		// var msg = new SpeechSynthesisUtterance(event.data);
+		// window.speechSynthesis.speak(msg);
+
+		bingcall(event.data)
+
+		
+
 	}
 
 })
@@ -187,9 +175,55 @@ function magnitude(arr){
 
 }
 
+
+function bingcall(text){
+
+	//Get you Authorization Bearer and put it in Headers
+	headers = {'X-Microsoft-OutputFormat': 'riff-8khz-8bit-mono-mulaw', 'Content-Type': 'application/ssml+xml','Authorization': 'Bearer '}
+		
+	$.ajax({
+		url: "https://speech.platform.bing.com/synthesize",
+		type: "POST",
+		headers: headers,
+		responseType: "arraybuffer",
+		data: "<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xmlns:mstts='http://www.w3.org/2001/mstts' xml:lang='en-US'><voice xml:lang='en-US' xml:gender='Female' name='Microsoft Server Speech Text to Speech Voice (en-US, ZiraRUS)'>"+text+"</voice></speak>",
+		error: function () {
+			console.log("Error Occured");
+		},
+		success: function (data) {
+			// console.log()
+			window.AudioContext = window.AudioContext || window.webkitAudioContext;
+			var context = new AudioContext();
+
+			// var soundBuffer = context.createBuffer(str2ab(data), true)
+			
+			context.decodeAudioData(str2ab(data), function(buffer) {
+				console.log("hello")
+				console.log(buffer)
+				  var source = context.createBufferSource();
+				  source.buffer = buffer;
+				  source.connect(context.destination);
+				  source.start(0);
+			}, function(error){
+				console.log(error)
+			});
+		}
+	})
+}
+
 var c = 0
-var title = "Sarthi"
+var title = "Saarthi"
 var speed = 100
+
+function str2ab(str) {
+	var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
+	var bufView = new Uint8Array(buf);
+	for (var i=0, strLen=str.length; i < strLen; i++) {
+	  bufView[i] = str.charCodeAt(i);
+	}
+	return buf;
+  }
+  
 
 function typeWriter(){
 
@@ -200,6 +234,9 @@ function typeWriter(){
 	}
 	
 }
+
+
+
 
 
 
