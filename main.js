@@ -179,36 +179,52 @@ function magnitude(arr){
 function bingcall(text){
 
 	//Get you Authorization Bearer and put it in Headers
-	headers = {'X-Microsoft-OutputFormat': 'riff-8khz-8bit-mono-mulaw', 'Content-Type': 'application/ssml+xml','Authorization': 'Bearer '}
-		
+	// put your bing api key here
+	headers1 = {'Ocp-Apim-Subscription-Key': ''}
+	//getting jwt token
 	$.ajax({
-		url: "https://speech.platform.bing.com/synthesize",
+		url: "https://api.cognitive.microsoft.com/sts/v1.0/issueToken",
 		type: "POST",
-		headers: headers,
-		responseType: "arraybuffer",
-		data: "<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xmlns:mstts='http://www.w3.org/2001/mstts' xml:lang='en-US'><voice xml:lang='en-US' xml:gender='Female' name='Microsoft Server Speech Text to Speech Voice (en-US, ZiraRUS)'>"+text+"</voice></speak>",
-		error: function () {
-			console.log("Error Occured");
+		headers: headers1,
+		error: function(error){
+			alert(error)
 		},
-		success: function (data) {
-			// console.log()
-			window.AudioContext = window.AudioContext || window.webkitAudioContext;
-			var context = new AudioContext();
+		success: function(data){
+			headers = {'X-Microsoft-OutputFormat': 'riff-8khz-8bit-mono-mulaw', 'Content-Type': 'application/ssml+xml','Authorization': 'Bearer '+data}
+			$.ajax({
+				url: "https://speech.platform.bing.com/synthesize",
+				type: "POST",
+				headers: headers,
+				responseType: "arraybuffer",
+				data: "<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xmlns:mstts='http://www.w3.org/2001/mstts' xml:lang='en-US'><voice xml:lang='en-US' xml:gender='Female' name='Microsoft Server Speech Text to Speech Voice (en-US, ZiraRUS)'>"+text+"</voice></speak>",
+				error: function () {
+					console.log("Error Occured");
+				},
+				success: function (data) {
+					// console.log()
+					window.AudioContext = window.AudioContext || window.webkitAudioContext;
+					var context = new AudioContext();
+		
+					// var soundBuffer = context.createBuffer(str2ab(data), true)
+					
+					context.decodeAudioData(str2ab(data), function(buffer) {
+						console.log("hello")
+						console.log(buffer)
+						  var source = context.createBufferSource();
+						  source.buffer = buffer;
+						  source.connect(context.destination);
+						  source.start(0);
+					}, function(error){
+						console.log(error)
+					});
+				}
+			})
 
-			// var soundBuffer = context.createBuffer(str2ab(data), true)
-			
-			context.decodeAudioData(str2ab(data), function(buffer) {
-				console.log("hello")
-				console.log(buffer)
-				  var source = context.createBufferSource();
-				  source.buffer = buffer;
-				  source.connect(context.destination);
-				  source.start(0);
-			}, function(error){
-				console.log(error)
-			});
 		}
 	})
+	
+		
+
 }
 
 var c = 0
