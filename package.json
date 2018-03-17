@@ -1,0 +1,22 @@
+{
+  "name": "leaponjs",
+  "version": "1.0.0",
+  "description": "Saarthi a real time translation technology that converts sign language to spoken language.",
+  "main": "electron.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Diuda/Sar.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Diuda/Sar/issues"
+  },
+  "homepage": "https://github.com/Diuda/Sar#readme",
+  "dependencies": {
+    "bootstrap": "^4.0.0-beta"
+  }
+}
